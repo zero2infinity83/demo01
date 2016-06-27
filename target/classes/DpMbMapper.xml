@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.mapper.dp.mb.DpMbMapper">
+   
+   <!-- retrieveList : 조회 결과 List -->
+   <select id="retrieveList" parameterType="Hashmap" resultType="java.util.HashMap">
+      SELECT * FROM (
+		  SELECT DISTINCT A.* FROM employees A 
+		      LEFT OUTER join dept_emp B ON A.emp_no = B.emp_no
+		      LEFT OUTER join dept_manager C ON A.emp_no = C.emp_no
+		) D 
+		<if test="searchOpt != null">
+			<if test="searchOpt == '01' and searchTxt != '' ">
+				WHERE D.emp_no = #{searchTxt}	
+			</if>
+			<if test="searchOpt == '02'">
+				WHERE D.first_name like CONCAT("%", #{searchTxt}, "%")	
+			</if>
+			<if test="searchOpt == '03'">
+				WHERE D.last_name like CONCAT("%", #{searchTxt}, "%")	
+			</if>
+		</if>
+		order by D.hire_date DESC
+		limit #{startNum}, #{pagePerNum}
+   </select>
+  
+   <!--  
+    <select id="retrieveList" parameterType="Hashmap" resultType="java.util.HashMap">
+      SELECT * FROM (
+		  SELECT DISTINCT A.*, D.dept_no, D.dept_name, E.from_date, E.to_date, F.title FROM employees A 
+		      LEFT OUTER join dept_emp B ON A.emp_no = B.emp_no
+		      LEFT OUTER join dept_manager C ON A.emp_no = C.emp_no
+              LEFT OUTER join departments D ON ( B.dept_no = D.dept_no OR C.dept_no = D.dept_no )
+              LEFT OUTER join salaries E ON A.emp_no = E.emp_no
+              LEFT OUTER join titles F ON A.emp_no = F.emp_no
+          WHERE D.dept_no is not null 
+          	AND E.to_date is not null          
+          
+		) G  
+		<if test="searchOpt != null">
+			<if test="searchOpt == 'emp_no' and searchTxt != '' ">
+				WHERE G.emp_no = #{searchTxt}	
+			</if>
+			<if test="searchOpt == 'first_name'">
+				WHERE G.first_name like CONCAT("%", #{searchTxt}, "%")	
+			</if>
+			<if test="searchOpt == 'last_name'">
+				WHERE G.last_name like CONCAT("%", #{searchTxt}, "%")	
+			</if>
+		</if>
+		order by G.hire_date DESC
+		limit #{startNum}, #{pagePerNum}
+   </select>
+   -->
+   
+   <!-- retrieveListNum : 조회결과 Rows Total Number -->
+   <select id="retrieveListTotalNum" parameterType="Hashmap" resultType="String">		  
+		  
+			SELECT count(*) FROM (
+			  SELECT DISTINCT A.* FROM employees A 
+			      LEFT OUTER join dept_emp B ON A.emp_no = B.emp_no
+			      LEFT OUTER join dept_manager C ON A.emp_no = C.emp_no
+			  <if test="searchOpt != null">
+					<if test="searchOpt == 'emp_no' and searchTxt != '' ">
+				WHERE A.emp_no = #{searchTxt}	
+					</if>
+					<if test="searchOpt == 'first_name'">
+				WHERE A.first_name like CONCAT("%", #{searchTxt}, "%")	
+					</if>
+					<if test="searchOpt == 'last_name'">
+				WHERE A.last_name like CONCAT("%", #{searchTxt}, "%")	
+					</if>
+				</if>
+			) D 
+		  						
+   </select>   
+   <!--  
+   <select id="retrieveListTotalNum" parameterType="Hashmap" resultType="String">		  
+		  
+			SELECT count(*) FROM (
+				SELECT DISTINCT A.*, D.dept_no, D.dept_name, E.from_date, E.to_date, F.title FROM employees A 
+			  		LEFT OUTER join dept_emp B ON A.emp_no = B.emp_no
+			      LEFT OUTER join dept_manager C ON A.emp_no = C.emp_no
+	            LEFT OUTER join departments D ON ( B.dept_no = D.dept_no OR C.dept_no = D.dept_no )
+	            LEFT OUTER join salaries E ON A.emp_no = E.emp_no
+	            LEFT OUTER join titles F ON A.emp_no = F.emp_no
+	      	WHERE D.dept_no is not null 
+	         	AND E.to_date is not null          
+	      
+			  <if test="searchOpt != null">
+					<if test="searchOpt == 'emp_no' and searchTxt != '' ">
+					AND A.emp_no = #{searchTxt}	
+					</if>
+					<if test="searchOpt == 'first_name'">
+					AND A.first_name like CONCAT("%", #{searchTxt}, "%")	
+					</if>
+					<if test="searchOpt == 'last_name'">
+					AND A.last_name like CONCAT("%", #{searchTxt}, "%")	
+					</if>
+				</if>
+			) G 
+		  						
+   </select>
+   -->   
+   
+   
+   <!-- retrieveDetail : 상세조회 -->
+   <select id="retrieveDetail" parameterType="Hashmap" resultType="java.util.HashMap">
+      SELECT A.*, D.salary, E.title, D.from_date, D.to_date, F.dept_no, F.dept_name  FROM employees A 
+        LEFT OUTER join dept_emp B ON A.emp_no = B.emp_no
+        LEFT OUTER join dept_manager C ON A.emp_no = C.emp_no
+        LEFT OUTER join salaries D ON A.emp_no = D.emp_no
+        LEFT OUTER join titles E ON A.emp_no = E.emp_no
+        LEFT OUTER join departments F ON B.dept_no = F.dept_no OR C.dept_no = F.dept_no        
+	    WHERE A.emp_no = #{empNo}
+	    ORDER BY D.to_date ASC
+   </select>
+   
+   
+   
+</mapper>
