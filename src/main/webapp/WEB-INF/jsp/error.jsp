@@ -7,6 +7,6 @@
 <title>Hello Millky</title>
 </head>
 <body>	
-	<h2>Erorr Page!!!</h2>	
+	<h2>Erorr Page!!! 변경 테스트</h2>	
 </body>
 </html>
